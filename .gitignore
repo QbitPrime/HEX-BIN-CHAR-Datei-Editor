@@ -1,0 +1,12 @@
+# Build-Artefakte
+hexeditor
+hexeditor.exe
+*.o
+*.obj
+
+# VS Code / lokale Historie
+.history/
+.vscode/
+
+# optional: Windows-Müll
+Thumbs.db
