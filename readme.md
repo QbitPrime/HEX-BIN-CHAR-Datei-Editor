@@ -1,119 +1,246 @@
-# HEX / BIN / ASCII DATEI-EDITOR – PHASE 2
----------------
+# HEX / BIN / ASCII DATEI-EDITOR – PHASE 3
+-----------------------------------------
 
-Dieses Projekt ist im Rahmen des Kurses
-„Programmierung mit C/C++“ entstanden.
+Dieses Projekt entstand im Rahmen des Kurses  
+„Programmierung mit C/C++“.
 
-In Phase 2 wird eine erste lauffähige Version eines einfachen
-Datei-Editors umgesetzt.
+Ziel der Anwendung ist ein einfacher Editor für Binärdateien,
+der einzelne Bytes einer Datei anzeigen und verändern kann.
+
+Der Dateiinhalt wird dabei in drei verschiedenen
+Darstellungsformen visualisiert:
+
+- Hexadezimal
+- Binär
+- ASCII
 
 
-## FUNKTIONALITÄT (PHASE 2)
------------------------
+## ENTWICKLUNGSUMGEBUNG
+-----------------------------------------
 
-- Laden einer Datei im Binärmodus
-- Tabellarische Anzeige des Datei-Inhalts:
-  * Index / Adresse
-  * Hexadezimaldarstellung
-  * Binärdarstellung
-  * ASCII-Zeichen (falls darstellbar)
-- Bearbeiten einzelner Bytes über die Kommandozeile
+Das Projekt wurde entwickelt mit:
+
+- Windows
+- Qt 6 (Qt Widgets)
+- MinGW Compiler
+- CMake Build System
+
+
+## FUNKTIONALITÄT
+-----------------------------------------
+
+Die Anwendung bietet folgende Funktionen:
+
+- Öffnen von Binärdateien über einen Dateidialog
+- Anzeige des Datei-Inhalts im Stil eines einfachen Hex-Editors
+- Darstellung jedes Bytes in:
+  - Hexadezimalform
+  - Binärform
+  - ASCII-Darstellung
+- Bearbeiten einzelner Bytes über eine grafische Oberfläche
 - Eingabe neuer Werte in:
-  * Hexadezimalform
-  * Binärform
-  * ASCII-Form
-- Anzeige des alten und neuen Wertes nach einer Bearbeitung
-- Speichern der Änderungen in einer neuen Datei
+  - Hexadezimalform
+  - Binärform
+  - ASCII-Form
+- Anzeige der Details eines Bytes:
+  - Hex
+  - Binär
+  - ASCII
+- Speichern der Datei
+- Speichern unter einem neuen Dateinamen
 
-Die grafische Benutzeroberfläche wird in Phase 3 umgesetzt.
+
+## BENUTZEROBERFLÄCHE
+-----------------------------------------
+
+Die grafische Benutzeroberfläche wurde mit **Qt Widgets**
+implementiert.
+
+Das Hauptfenster besteht aus:
+
+- einer Hex-Editor Anzeige des Datei-Inhalts
+- Eingabefeldern zur Bearbeitung einzelner Bytes
+- einer Detailanzeige für das aktuell bearbeitete Byte
+- einem Menü zum Öffnen und Speichern von Dateien
+
+Die Darstellung erfolgt zeilenweise:
+
+Adresse | Hex-Werte | ASCII-Darstellung
+
+
+## Screenshot
+-----------------------------------------
+
+![Hex Editor UI](docs/screenshot.png)
+
+Das Diagramm zeigt die modulare Architektur der Anwendung.
+
+Die grafische Oberfläche wird von der Klasse MainWindow gesteuert.
+Für den Zugriff auf Dateien wird der FileManager verwendet.
+Die Klasse Converter übernimmt die Umrechnung einzelner Bytes
+in Hex-, Binär- und ASCII-Darstellungen.
+
+
+## SOFTWAREARCHITEKTUR
+-----------------------------------------
+
+Die Anwendung ist modular aufgebaut und besteht aus drei
+zentralen Komponenten:
+
+
+MainWindow
+GUI / Steuerung
+
+↓
+
+FileManager
+Laden / Speichern von Dateien
+Ändern einzelner Bytes
+
+↓
+
+Converter
+Umrechnung einzelner Bytes in
+Hex / Bin / ASCII Darstellung
+
+
+### MainWindow
+-----------------------------------------
+
+Die Klasse `MainWindow` stellt die grafische Benutzeroberfläche
+bereit und verbindet die Benutzerinteraktion mit der
+Programmlogik.
+
+Aufgaben:
+
+- Aufbau der GUI
+- Öffnen und Speichern von Dateien
+- Bearbeiten einzelner Bytes
+- Aktualisierung der Anzeige
+
+
+### FileManager
+-----------------------------------------
+
+Die Klasse `FileManager` übernimmt den Zugriff auf
+Binärdateien.
+
+Aufgaben:
+
+- Laden einer Datei in einen Byte-Puffer
+- Speichern der Daten auf die Festplatte
+- Ändern einzelner Bytes
+
+
+### Converter
+-----------------------------------------
+
+Die Klasse `Converter` wandelt einzelne Bytes in verschiedene
+Darstellungsformen um:
+
+- Hexadezimal
+- Binär
+- ASCII
 
 
 ## PROJEKTSTRUKTUR
----------------
+-----------------------------------------
+
 
 src/
-  - main.cpp
-  - FileManager.cpp
-  - Converter.cpp
+main.cpp
+MainWindow.cpp
+filemanager.cpp
+converter.cpp
 
 include/
-  - FileManager.h
-  - Converter.h
+MainWindow.h
+filemanager.h
+converter.h
+
+docs/
+screenshot.png
 
 Weitere Dateien:
-  - README.txt
-  - .gitignore
-  - test.bin (Beispieldatei)
+CMakeLists.txt
+README.md
+test.bin
+
 
 
 ## KOMPILIERUNG
-------------
+-----------------------------------------
 
 Voraussetzungen:
-- C++-Compiler (z. B. g++ / MinGW unter Windows)
-- Kompilierung im Projektordner
 
-Kompilierbefehl:
-
-g++ -Iinclude src/main.cpp src/FileManager.cpp src/Converter.cpp -o hexeditor
+- Qt 6 (Qt Widgets)
+- CMake
+- MinGW oder kompatibler C++ Compiler
 
 
-## AUSFÜHRUNG
-----------
+### Build
 
-1) Datei anzeigen
-
-Befehl:
-  hexeditor test.bin
-
-Beschreibung:
-  Die Datei wird vollständig geladen und byteweise in
-  Hex-, Binär- und ASCII-Darstellung ausgegeben.
-
-Hinweis:
-  Die Datei „test.bin“ dient als Beispieldatei.
-  Es können auch beliebige andere Dateien als Eingabe
-  übergeben werden.
+Im Projektordner:
 
 
-2) Byte bearbeiten und speichern
-
-Befehl:
-  hexeditor <input> <output> <index> <hex|bin|ascii> <value>
-
-Beispiele:
-  hexeditor test.bin test_modified.bin 0 hex 58
-  hexeditor test.bin test_modified.bin 1 bin 01100001
-  hexeditor test.bin test_modified.bin 2 ascii Z
-
-Ergebnis:
-  Nach der Bearbeitung wird das geänderte Byte vor und
-  nach der Änderung angezeigt. Anschließend wird die
-  modifizierte Datei gespeichert.
+cmake -S . -B build -DCMAKE_PREFIX_PATH="C:\Qt\6.x.x\mingw_64"
+cmake --build build
 
 
-ENTWICKLUNGSSTAND
------------------
 
-Diese Version entspricht Phase 2 (Beginning).
-
-Der Fokus liegt auf der Kernlogik:
-- Dateiverwaltung
-- Umrechnungslogik
-- Benutzerinteraktion über die Kommandozeile
-
-Eine grafische Benutzeroberfläche sowie erweiterte
-Bearbeitungsfunktionen folgen in Phase 3.
+## STARTEN
+-----------------------------------------
 
 
-HINWEIS ZUR NUTZUNG VON KI-WERKZEUGEN
-------------------------------------
+build\HexEditorQt.exe
 
-KI-basierte Werkzeuge wurden unterstützend bei der
-sprachlichen Strukturierung der Dokumentation sowie
-bei der Fehlersuche und Analyse von Compiler- und
-Laufzeitfehlern eingesetzt.
 
-Die Konzeption der Softwarearchitektur, die Implementierung
-des Codes sowie die Tests der Anwendung erfolgten
-eigenständig.
+
+### Hinweis zu Qt Bibliotheken (Windows)
+
+Beim manuellen Start der Anwendung können unter Windows
+fehlende Qt Bibliotheken auftreten.
+
+Diese können automatisch mit `windeployqt`
+in den Build-Ordner kopiert werden:
+
+
+C:\Qt\6.x.x\mingw_64\bin\windeployqt.exe build\HexEditorQt.exe
+
+
+Danach kann das Programm normal gestartet werden:
+
+
+build\HexEditorQt.exe
+
+
+
+## ENTWICKLUNGSSTAND
+-----------------------------------------
+
+Diese Version entspricht **Phase 3** des Projekts.
+
+In Phase 3 wurde die zuvor entwickelte Konsolenanwendung
+(Phase 2) um eine grafische Benutzeroberfläche erweitert.
+
+Der Fokus lag auf:
+
+- Integration von Qt Widgets
+- grafischer Darstellung der Binärdaten
+- Benutzerinteraktion über eine GUI
+- Bearbeitung einzelner Bytes innerhalb der Anwendung
+
+
+## HINWEIS ZUR NUTZUNG VON KI-WERKZEUGEN
+-----------------------------------------
+
+KI-basierte Werkzeuge wurden unterstützend verwendet
+für:
+
+- Analyse von Compilerfehlern
+- Unterstützung bei der Strukturierung des Codes
+- sprachliche Verbesserung der Dokumentation
+
+Die Konzeption der Softwarearchitektur,
+die Implementierung der Funktionen sowie
+das Testen der Anwendung erfolgten eigenständig.
