@@ -18,9 +18,7 @@ Programmlogik (FileManager + Converter).
 
 /*
 Forward Declarations der Qt Widgets.
-
 Die tatsächlichen Includes erfolgen in der .cpp Datei.
-Dies reduziert Abhängigkeiten und beschleunigt das Kompilieren.
 */
 class QPlainTextEdit;
 class QLineEdit;
@@ -43,48 +41,30 @@ class MainWindow : public QMainWindow {
     Q_OBJECT
 
 public:
-
-    /*
-    Konstruktor des Hauptfensters.
-
-    Initialisiert die GUI-Komponenten und baut das Layout
-    der Anwendung auf.
-    */
     explicit MainWindow(QWidget* parent = nullptr);
 
 private slots:
 
-    /*
-    Öffnet eine Datei über einen Dateidialog und lädt sie
-    mit Hilfe des FileManager.
-    */
+
+    // Öffnet eine Datei über einen Dateidialog und lädt sie mit Hilfe des FileManager.
     void openFile();
 
-    /*
-    Speichert die aktuell geladene Datei.
-    Falls noch kein Dateipfad existiert, wird automatisch
-    ein "Speichern unter" Dialog geöffnet.
-    */
+    //Speichert die aktuell geladene Datei.
     void saveFile();
 
-    /*
-    Speichert die Datei unter einem neuen Namen.
-    */
+    //Speichert die Datei unter einem neuen Namen.
     void saveFileAs();
-
-    /*
-    Wendet eine Byte-Änderung an.
-
-    Der Benutzer gibt Index, Modus (hex/bin/ascii)
-    und einen neuen Wert ein.
-    */
+   
+    // Wendet eine Byte-Änderung an.
     void applyChange();
+    
+    //Zeigt eine kurze Hilfe zur Benutzung der Anwendung an.
+    void showHelp();
 
 private:
 
     /*
     Baut die komplette Hex-Editor Ansicht neu auf.
-
     Dabei wird die Datei zeilenweise dargestellt:
     Adresse | Hex Werte | ASCII Darstellung
     */
@@ -92,7 +72,6 @@ private:
 
     /*
     Wandelt eine Benutzereingabe in ein Byte um.
-
     Unterstützte Eingabeformate:
     - hex
     - bin
@@ -112,7 +91,6 @@ private:
 
     /*
     Hilfsfunktion für Speichern.
-
     Wenn noch kein Dateipfad existiert,
     wird ein "Speichern unter" Dialog geöffnet.
     */

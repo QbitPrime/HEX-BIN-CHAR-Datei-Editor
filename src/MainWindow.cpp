@@ -1,6 +1,7 @@
 #include "MainWindow.h"
 
 // Qt Widgets für GUI Elemente
+#include <QMessageBox>
 #include <QPlainTextEdit>
 #include <QFileDialog>
 #include <QMenuBar>
@@ -100,6 +101,12 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
     fileMenu->addAction("&Öffnen...", this, &MainWindow::openFile);
     fileMenu->addAction("&Speichern", this, &MainWindow::saveFile);
     fileMenu->addAction("Speichern &unter...", this, &MainWindow::saveFileAs);
+    
+    /*
+    Hilfe Menü mit kurzer Anleitung zur Benutzung der Anwendung
+    */
+    auto* helpMenu = menuBar()->addMenu("&Hilfe");
+    helpMenu->addAction("&Benutzung", this, &MainWindow::showHelp);
 
     // Verbindung des Buttons mit der Änderungsfunktion
     connect(applyBtn_, &QPushButton::clicked,
@@ -107,7 +114,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
 
     statusBar()->showMessage("Bereit");
 
-    setWindowTitle("Hex Editor (Qt simpel)");
+    setWindowTitle("Hex Editor");
     resize(1050, 650);
 }
 
@@ -225,6 +232,52 @@ void MainWindow::saveFileAs() {
     );
 
     rebuildView();
+}
+
+/*
+------------------------------------------------------------
+Zeigt eine kurze Hilfe zur Benutzung des Programms an.
+
+Die Hilfe erklärt dem Benutzer die grundlegenden Schritte:
+Datei öffnen, Index eingeben, Modus wählen, Wert ändern
+und Datei speichern.
+------------------------------------------------------------
+*/
+void MainWindow::showHelp() {
+
+    QMessageBox::information(
+        this,
+        "Benutzung",
+        "Benutzung des Hex Editors:\n\n"
+
+        "1. Öffnen Sie eine Binärdatei über Datei -> Öffnen.\n"
+        "2. Der Inhalt der Datei wird im Editor angezeigt.\n\n"
+
+        "INDEX:\n"
+        "Der Index gibt die Position eines Bytes in der Datei an.\n"
+        "Das erste Byte hat den Index 0.\n"
+        "Das zweite Byte hat den Index 1 usw.\n"
+        "Der Index wird unten links im Eingabefeld eingegeben.\n\n"
+
+        "Beispiel:\n"
+        "Index 0  -> erstes Byte der Datei\n"
+        "Index 10 -> elftes Byte der Datei\n\n"
+
+        "BYTE ÄNDERN:\n"
+        "3. Geben Sie den gewünschten Index ein.\n"
+        "4. Wählen Sie den Modus: hex, bin oder ascii.\n"
+        "5. Geben Sie einen neuen Wert ein.\n"
+        "6. Klicken Sie auf 'Ändern', um das Byte zu bearbeiten.\n\n"
+
+        "SPEICHERN:\n"
+        "7. Speichern Sie die Datei über Datei -> Speichern\n"
+        "   oder Datei -> Speichern unter.\n\n"
+
+        "Beispiele für Werte:\n"
+        "hex   : FF\n"
+        "bin   : 01000001\n"
+        "ascii : Z"
+    );
 }
 
 /*

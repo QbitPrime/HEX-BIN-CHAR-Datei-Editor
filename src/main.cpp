@@ -26,38 +26,8 @@ Ablauf:
 */
 int main(int argc, char *argv[])
 {
-    /*
-    QApplication ist das zentrale Objekt jeder Qt GUI Anwendung.
-
-    Es verwaltet:
-    - das Event-System
-    - Fenster
-    - Benutzerinteraktionen (Maus, Tastatur)
-    */
     QApplication app(argc, argv);
-
-    /*
-    Erzeugt das Hauptfenster der Anwendung.
-
-    Die Klasse MainWindow baut dabei die komplette GUI auf
-    und stellt alle Funktionen des Hex-Editors bereit.
-    */
     MainWindow window;
-
-    /*
-    Zeigt das Hauptfenster auf dem Bildschirm an.
-    */
     window.show();
-
-    /*
-    Startet die Qt Event-Schleife.
-
-    Diese Schleife verarbeitet:
-    - Benutzerinteraktionen
-    - GUI Updates
-    - Events der Anwendung
-
-    Die Funktion blockiert, bis das Fenster geschlossen wird.
-    */
     return app.exec();
 }
