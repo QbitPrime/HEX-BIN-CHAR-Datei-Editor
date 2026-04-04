@@ -48,6 +48,7 @@ Die Anwendung bietet folgende Funktionen:
   - ASCII
 - Speichern der Datei
 - Speichern unter einem neuen Dateinamen
+- Hilfe-Menü mit kurzer Bedienungsanleitung
 
 
 ## BENUTZEROBERFLÄCHE
@@ -62,46 +63,71 @@ Das Hauptfenster besteht aus:
 - Eingabefeldern zur Bearbeitung einzelner Bytes
 - einer Detailanzeige für das aktuell bearbeitete Byte
 - einem Menü zum Öffnen und Speichern von Dateien
+- einem Hilfe-Menü zur Erklärung der Benutzung
 
 Die Darstellung erfolgt zeilenweise:
 
 Adresse | Hex-Werte | ASCII-Darstellung
 
 
-## Screenshot
+## SCREENSHOT
 -----------------------------------------
 
 ![Hex Editor UI](docs/screenshot.png)
-
-Das Diagramm zeigt die modulare Architektur der Anwendung.
-
-Die grafische Oberfläche wird von der Klasse MainWindow gesteuert.
-Für den Zugriff auf Dateien wird der FileManager verwendet.
-Die Klasse Converter übernimmt die Umrechnung einzelner Bytes
-in Hex-, Binär- und ASCII-Darstellungen.
 
 
 ## SOFTWAREARCHITEKTUR
 -----------------------------------------
 
 Die Anwendung ist modular aufgebaut und besteht aus drei
-zentralen Komponenten:
+zentralen Bereichen:
+
+- GUI-Modul
+- Logik-Modul
+- Daten-Modul
 
 
-MainWindow
-GUI / Steuerung
+## ARCHITEKTURDIAGRAMM
+-----------------------------------------
 
-↓
+![Architekturdiagramm](docs/architecture.png)
 
-FileManager
-Laden / Speichern von Dateien
-Ändern einzelner Bytes
+Das Diagramm zeigt die modulare Architektur der Anwendung mit den
+wichtigsten Dateien und ihren Abhängigkeiten.
 
-↓
+Das **GUI-Modul** besteht aus `main.cpp`, `MainWindow.h` und
+`MainWindow.cpp`.
 
-Converter
-Umrechnung einzelner Bytes in
-Hex / Bin / ASCII Darstellung
+- `main.cpp` bildet den Einstiegspunkt des Programms,
+  initialisiert die Qt-Anwendung und erzeugt das Hauptfenster.
+- `MainWindow.h` enthält die Klassendeklaration des Hauptfensters.
+- `MainWindow.cpp` implementiert die grafische Oberfläche,
+  die Menüs sowie die Benutzerinteraktion.
+
+Das **Logik-Modul** besteht aus `filemanager.h/.cpp` und
+`converter.h/.cpp`.
+
+- Der `FileManager` übernimmt das Laden und Speichern von Dateien
+  sowie das Ändern einzelner Bytes im internen Datenpuffer.
+- Der `Converter` wandelt einzelne Byte-Werte in Hex-, Binär-
+  und ASCII-Darstellungen um.
+
+Das **Daten-Modul** besteht aus der eigentlichen Binärdatei,
+zum Beispiel `test.bin`.
+
+Die Pfeile im Diagramm zeigen gerichtete Abhängigkeiten:
+
+- `main.cpp` greift auf `MainWindow` zu, um die Anwendung zu starten.
+- `MainWindow.cpp` verwendet den `FileManager`, um Dateien zu laden,
+  zu speichern und Byte-Werte zu ändern.
+- `MainWindow.cpp` verwendet den `Converter`, um Byte-Werte für die
+  Anzeige in Hex-, Binär- und ASCII-Form umzuwandeln.
+- Der `FileManager` greift direkt auf die Binärdatei zu, um Daten
+  zu lesen oder zu speichern.
+
+Die Datei selbst enthält keine Logik und kennt die anderen Module
+nicht. Daher zeigt die Abhängigkeit nur vom `FileManager`
+zur Binärdatei und nicht in beide Richtungen.
 
 
 ### MainWindow
@@ -117,6 +143,7 @@ Aufgaben:
 - Öffnen und Speichern von Dateien
 - Bearbeiten einzelner Bytes
 - Aktualisierung der Anzeige
+- Bereitstellung eines Hilfe-Menüs
 
 
 ### FileManager
@@ -143,29 +170,88 @@ Darstellungsformen um:
 - ASCII
 
 
+## ERKLÄRUNG DER WICHTIGSTEN METHODEN
+-----------------------------------------
+
+Die zentrale Steuerung der Anwendung erfolgt über die Klasse
+`MainWindow`. Sie verbindet die grafische Benutzeroberfläche
+mit der Programmlogik und ruft die entsprechenden Funktionen
+des `FileManager` und des `Converter` auf.
+
+Die Methode `openFile()` wird über das Menü „Datei → Öffnen“
+ausgelöst. Sie öffnet einen Dateidialog, über den der Benutzer
+eine Binärdatei auswählen kann. Anschließend wird die Datei
+über den `FileManager` geladen. Nach erfolgreichem Laden
+ruft die Methode `rebuildView()` auf, um den Inhalt der Datei
+im Hex-Editor darzustellen.
+
+Die Methode `saveFile()` speichert die aktuell geladene Datei
+unter dem bestehenden Pfad. Falls noch kein Dateipfad vorhanden
+ist, wird über `ensurePathForSave()` automatisch ein
+„Speichern unter“-Dialog geöffnet. Die eigentliche Speicherung
+erfolgt durch den `FileManager`.
+
+Die Methode `saveFileAs()` erlaubt das Speichern der Datei unter
+einem neuen Dateinamen. Dadurch kann eine bearbeitete Datei
+gespeichert werden, ohne die Originaldatei zu überschreiben.
+
+Die Methode `applyChange()` implementiert die zentrale
+Bearbeitungsfunktion des Editors. Sie liest zunächst den vom
+Benutzer eingegebenen Index aus und prüft, ob dieser innerhalb
+der Dateigröße liegt. Anschließend wird der eingegebene Wert
+abhängig vom gewählten Modus (hex, bin oder ascii) mit Hilfe
+der Methode `parseByteValueQt()` in ein Byte umgewandelt.
+Danach wird das entsprechende Byte im internen Puffer des
+`FileManager` geändert. Zum Abschluss wird die Anzeige über
+`rebuildView()` aktualisiert und die Detailinformationen über
+`updateDetails()` neu berechnet.
+
+Die Methode `parseByteValueQt()` übernimmt die Interpretation
+der Benutzereingabe. Sie prüft, in welchem Format der Benutzer
+den Wert eingegeben hat, und wandelt diesen in einen
+`uint8_t`-Wert um. Unterstützt werden hexadezimale Eingaben,
+binäre Eingaben mit acht Bits sowie einzelne ASCII-Zeichen.
+
+Die Methode `rebuildView()` baut die komplette Anzeige des
+Hex-Editors neu auf. Sie iteriert über den internen Byte-Puffer
+und formatiert die Daten zeilenweise. Pro Zeile werden die
+Adresse, die Hex-Werte sowie die ASCII-Darstellung ausgegeben.
+
+Die Methode `updateDetails()` zeigt zusätzliche Informationen
+zu einem einzelnen Byte an. Nach einer Änderung oder Auswahl
+eines Index werden der Hex-Wert, die Binärdarstellung sowie
+das ASCII-Zeichen berechnet und im Detailbereich der
+Benutzeroberfläche angezeigt.
+
+Zusammen bilden diese Methoden den zentralen Ablauf der
+Anwendung. Die GUI nimmt Eingaben entgegen, ruft die
+Logikfunktionen auf und aktualisiert anschließend die
+Darstellung. Dadurch bleibt die Verantwortung klar getrennt
+und die Architektur der Anwendung übersichtlich.
+
+
 ## PROJEKTSTRUKTUR
 -----------------------------------------
 
-
 src/
-main.cpp
-MainWindow.cpp
-filemanager.cpp
-converter.cpp
+  main.cpp
+  MainWindow.cpp
+  filemanager.cpp
+  converter.cpp
 
 include/
-MainWindow.h
-filemanager.h
-converter.h
+  MainWindow.h
+  filemanager.h
+  converter.h
 
 docs/
-screenshot.png
+  screenshot.png
+  architecture.png
 
 Weitere Dateien:
-CMakeLists.txt
-README.md
-test.bin
-
+  CMakeLists.txt
+  README.md
+  test.bin
 
 
 ## KOMPILIERUNG
@@ -182,18 +268,14 @@ Voraussetzungen:
 
 Im Projektordner:
 
-
 cmake -S . -B build -DCMAKE_PREFIX_PATH="C:\Qt\6.x.x\mingw_64"
 cmake --build build
-
 
 
 ## STARTEN
 -----------------------------------------
 
-
 build\HexEditorQt.exe
-
 
 
 ### Hinweis zu Qt Bibliotheken (Windows)
@@ -204,15 +286,41 @@ fehlende Qt Bibliotheken auftreten.
 Diese können automatisch mit `windeployqt`
 in den Build-Ordner kopiert werden:
 
-
 C:\Qt\6.x.x\mingw_64\bin\windeployqt.exe build\HexEditorQt.exe
-
 
 Danach kann das Programm normal gestartet werden:
 
-
 build\HexEditorQt.exe
 
+
+## BENUTZUNG
+-----------------------------------------
+
+1. Öffnen Sie eine Binärdatei über `Datei -> Öffnen`.
+2. Der Dateiinhalt wird im Editor angezeigt.
+3. Geben Sie einen Index ein.
+4. Wählen Sie den Modus `hex`, `bin` oder `ascii`.
+5. Geben Sie einen neuen Wert ein.
+6. Klicken Sie auf `Ändern`, um das Byte zu bearbeiten.
+7. Speichern Sie die Datei über `Datei -> Speichern`
+   oder `Datei -> Speichern unter`.
+
+### Bedeutung des Index
+
+Der Index gibt die Position eines Bytes in der Datei an.
+
+- Das erste Byte hat den Index `0`
+- Das zweite Byte hat den Index `1`
+- Das elfte Byte hat den Index `10`
+
+Der Benutzer kann dadurch gezielt ein einzelnes Byte an
+einer bestimmten Position auswählen und verändern.
+
+### Beispiele für Werte
+
+- `hex`   : `FF`
+- `bin`   : `01000001`
+- `ascii` : `Z`
 
 
 ## ENTWICKLUNGSSTAND
@@ -229,17 +337,18 @@ Der Fokus lag auf:
 - grafischer Darstellung der Binärdaten
 - Benutzerinteraktion über eine GUI
 - Bearbeitung einzelner Bytes innerhalb der Anwendung
+- Verbesserung der Dokumentation und Softwarestruktur
 
 
 ## HINWEIS ZUR NUTZUNG VON KI-WERKZEUGEN
 -----------------------------------------
 
-KI-basierte Werkzeuge wurden unterstützend verwendet
-für:
+KI-basierte Werkzeuge wurden unterstützend verwendet für:
 
 - Analyse von Compilerfehlern
 - Unterstützung bei der Strukturierung des Codes
 - sprachliche Verbesserung der Dokumentation
+- Erstellung und Überarbeitung von Architekturdiagrammen
 
 Die Konzeption der Softwarearchitektur,
 die Implementierung der Funktionen sowie
